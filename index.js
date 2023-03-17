@@ -21,7 +21,15 @@ const { Post } = require("./models");
 
 app.get("/", async (req, res) => {
   try {
-    res.render("index");
+    res.redirect("/generate");
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+app.get("/generate", async (req, res) => {
+  try {
+    res.render("generate");
   } catch (error) {
     console.log(error);
   }
