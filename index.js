@@ -17,6 +17,8 @@ const configuration = new Configuration({
 
 const openai = new OpenAIApi(configuration);
 
+const { Post } = require("./models");
+
 app.get("/", async (req, res) => {
   try {
     res.render("index");
@@ -49,6 +51,14 @@ app.post("/chat", async (req, res) => {
           content,
         },
       ],
+    });
+
+    await Post.createPost({
+      topic,
+      type,
+      keywords,
+      tone,
+      data: response.data.choices[0].message.content.trim(),
     });
 
     console.log(response.data);
