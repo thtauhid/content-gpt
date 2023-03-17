@@ -37,6 +37,18 @@ app.get("/generate", async (req, res) => {
   }
 });
 
+app.get("/single/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const post = await Post.getPost(id);
+
+    res.render("single", { post });
+  } catch (error) {
+    console.log(error);
+  }
+});
+
 app.post("/chat", async (req, res) => {
   try {
     console.log(req.body);

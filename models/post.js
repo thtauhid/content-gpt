@@ -28,6 +28,15 @@ module.exports = (sequelize, DataTypes) => {
       });
       return posts;
     }
+
+    static async getPost(id) {
+      const post = await this.findOne({
+        where: {
+          id,
+        },
+      });
+      return post;
+    }
   }
   Post.init(
     {
