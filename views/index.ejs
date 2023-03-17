@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Content GPT</title>
+    <link
+      rel="stylesheet"
+      href="https://bootswatch.com/5/flatly/bootstrap.min.css"
+    />
+  </head>
+  <body>
+    <div class="container mt-5">
+      <h1 class="text-center mb-3">Content GPT</h1>
+      <!-- <p class="text-center mb-5">
+        This tool enables the transformation of plain language into language
+        that aligns with professional standards, lending a more polished and
+        refined tone to the resulting text.
+      </p> -->
+      <div class="row">
+        <div class="col-6">
+          <h3 class="text-center">Instructions</h3>
+          <textarea
+            name="topic"
+            id="topic"
+            cols="30"
+            rows="3"
+            class="mb-3 form-control"
+            placeholder="Enter topic here"
+            required
+          ></textarea>
+          <input
+            name="type"
+            id="type"
+            type="text"
+            class="form-control mb-3"
+            placeholder="Type (optional)"
+          />
+          <input
+            name="keywords"
+            id="keywords"
+            type="text"
+            class="form-control mb-3"
+            placeholder="Keywords (optional)"
+          />
+          <input
+            name="tone"
+            id="tone"
+            type="text"
+            class="form-control mb-3"
+            placeholder="Tone of voice (optional)"
+          />
+
+          <button class="btn btn-primary form-control mb-3" onclick="makeit()">
+            Generate
+          </button>
+        </div>
+        <div class="col-6">
+          <h3 class="text-center">Content</h3>
+          <textarea
+            name="protext"
+            id="protext"
+            cols="30"
+            rows="10"
+            class="mb-3 form-control"
+            readonly
+            placeholder="Your content will appear here"
+          ></textarea
+          ><br />
+        </div>
+      </div>
+    </div>
+    <script>
+      async function makeit() {
+        let topic = document.getElementById("topic").value;
+        let type = document.getElementById("type").value;
+        let keywords = document.getElementById("keywords").value;
+        let tone = document.getElementById("tone").value;
+
+        document.getElementById("protext").value = "Generating..."; // show loading indicator
+
+        await fetch("/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            topic: topic,
+            type: type,
+            keywords: keywords,
+            tone: tone,
+          }),
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            document.getElementById("protext").value = data.message;
+          })
+          .catch((err) => console.log(err));
+      }
+    </script>
+  </body>
+</html>
