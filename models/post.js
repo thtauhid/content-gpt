@@ -21,6 +21,13 @@ module.exports = (sequelize, DataTypes) => {
       });
       return post;
     }
+
+    static async getAllPosts() {
+      const posts = await this.findAll({
+        order: [["createdAt", "DESC"]],
+      });
+      return posts;
+    }
   }
   Post.init(
     {

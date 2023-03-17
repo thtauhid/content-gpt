@@ -21,7 +21,9 @@ const { Post } = require("./models");
 
 app.get("/", async (req, res) => {
   try {
-    res.redirect("/generate");
+    const posts = await Post.getAllPosts();
+
+    res.render("index", { posts });
   } catch (error) {
     console.log(error);
   }
@@ -38,14 +40,15 @@ app.get("/generate", async (req, res) => {
 app.post("/chat", async (req, res) => {
   try {
     console.log(req.body);
-    let { topic, type, keywords, tone } = req.body;
-
-    if (type == "none") type = undefined;
+    const { topic, type, keywords, tone } = req.body;
 
     let content = `I want to write a blog post about ${topic} and`;
-    if (type) content += ` I want to write it as a ${type} post.`;
+    if (type || type != "none")
+      content += ` I want to write it as a ${type} post.`;
     if (keywords) content += ` Include the koywords: ${keywords}.`;
     if (tone) content += ` I want to write it in a ${tone} tone.`;
+
+    console.table({ content });
 
     const response = await openai.createChatCompletion({
       model: "gpt-3.5-turbo",
