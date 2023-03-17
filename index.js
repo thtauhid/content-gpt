@@ -28,7 +28,9 @@ app.get("/", async (req, res) => {
 app.post("/chat", async (req, res) => {
   try {
     console.log(req.body);
-    const { topic, type, keywords, tone } = req.body;
+    let { topic, type, keywords, tone } = req.body;
+
+    if (type == "none") type = undefined;
 
     let content = `I want to write a blog post about ${topic} and`;
     if (type) content += ` I want to write it as a ${type} post.`;
@@ -38,10 +40,10 @@ app.post("/chat", async (req, res) => {
     const response = await openai.createChatCompletion({
       model: "gpt-3.5-turbo",
       messages: [
-        // {
-        //   role: "system",
-        //   content: "Create a blog post",
-        // },
+        {
+          role: "system",
+          content: "You only generate high quality seo friendly blog content",
+        },
         {
           role: "user",
           content,

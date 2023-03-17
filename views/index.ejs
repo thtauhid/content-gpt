@@ -5,72 +5,82 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Content GPT</title>
-    <link
-      rel="stylesheet"
-      href="https://bootswatch.com/5/flatly/bootstrap.min.css"
-    />
+    <script src="https://cdn.tailwindcss.com"></script>
   </head>
-  <body>
-    <div class="container mt-5">
-      <h1 class="text-center mb-3">Content GPT</h1>
-      <!-- <p class="text-center mb-5">
-        This tool enables the transformation of plain language into language
-        that aligns with professional standards, lending a more polished and
-        refined tone to the resulting text.
-      </p> -->
-      <div class="row">
-        <div class="col-6">
-          <h3 class="text-center">Instructions</h3>
-          <textarea
-            name="topic"
-            id="topic"
-            cols="30"
-            rows="3"
-            class="mb-3 form-control"
-            placeholder="Enter topic here"
-            required
-          ></textarea>
-          <input
-            name="type"
-            id="type"
-            type="text"
-            class="form-control mb-3"
-            placeholder="Type (optional)"
-          />
-          <input
-            name="keywords"
-            id="keywords"
-            type="text"
-            class="form-control mb-3"
-            placeholder="Keywords (optional)"
-          />
-          <input
-            name="tone"
-            id="tone"
-            type="text"
-            class="form-control mb-3"
-            placeholder="Tone of voice (optional)"
-          />
+  <body style="max-width: 75%" class="mx-auto">
+    <div class="flex flex-col mt-5">
+      <h1 class="text-center mb-3 text-3xl font-bold">Content GPT</h1>
+      <div class="flex flex-col border-2 border-stone-900 p-5 m-2">
+        <h3 class="text-xl ml-5">Instructions</h3>
+        <div class="flex flex-row">
+          <div class="basis-1/2 flex flex-col p-5">
+            <label class="mb-2" for="topic">Topic / Details</label>
+            <textarea
+              name="topic"
+              id="topic"
+              cols="30"
+              rows="9"
+              class="mb-3 border-2 border-stone-500 p-3"
+              placeholder="Enter brief details here"
+              required
+            ></textarea>
+          </div>
+          <div class="basis-1/2 flex flex-col p-5">
+            <label class="mb-2" for="type">Type</label>
+            <select
+              name="type"
+              id="type"
+              class="mb-3 border-2 border-stone-500 p-3"
+              placeholder="Type (optional)"
+            >
+              <option disabled selected value="none">Type (Optional)</option>
+              <option value="title">Title</option>
+              <option value="intro">Intro</option>
+              <option value="outline">Outline</option>
+              <option value="content">Content</option>
+              <option value="conclusion">Conclusion</option>
+            </select>
 
-          <button class="btn btn-primary form-control mb-3" onclick="makeit()">
-            Generate
-          </button>
+            <label class="mb-2" for="keywords">Keywords</label>
+            <input
+              name="keywords"
+              id="keywords"
+              type="text"
+              class="mb-3 border-2 border-stone-500 p-3"
+              placeholder="Keywords (optional)"
+            />
+
+            <label class="mb-2" for="tone">Tone</label>
+            <input
+              name="tone"
+              id="tone"
+              type="text"
+              class="mb-3 border-2 border-stone-500 p-3"
+              placeholder="Tone of voice (optional)"
+            />
+          </div>
         </div>
-        <div class="col-6">
-          <h3 class="text-center">Content</h3>
-          <textarea
-            name="protext"
-            id="protext"
-            cols="30"
-            rows="10"
-            class="mb-3 form-control"
-            readonly
-            placeholder="Your content will appear here"
-          ></textarea
-          ><br />
-        </div>
+
+        <button
+          id="generate-btn"
+          class="mb-3 border-2 border-sky-900 p-3 bg-sky-500 text-white mx-5"
+          onclick="makeit()"
+        >
+          Generate
+        </button>
       </div>
+
+      <div id="app"></div>
+
+      <textarea
+        name="protext"
+        id="protext"
+        cols="30"
+        rows="100"
+        class="border-2 border-stone-900 m-2 p-20"
+      ></textarea>
     </div>
+    <script src="https://unpkg.com/typewriter-effect@latest/dist/core.js"></script>
     <script>
       async function makeit() {
         let topic = document.getElementById("topic").value;
@@ -78,25 +88,71 @@
         let keywords = document.getElementById("keywords").value;
         let tone = document.getElementById("tone").value;
 
-        document.getElementById("protext").value = "Generating..."; // show loading indicator
+        if (topic) {
+          // disable button
+          document.getElementById("generate-btn").disabled = true;
+          document.getElementById("generate-btn").classList =
+            "mb-3 border-2 border-sky-200 p-3 bg-sky-200 text-white mx-5";
 
-        await fetch("/chat", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            topic: topic,
-            type: type,
-            keywords: keywords,
-            tone: tone,
-          }),
-        })
-          .then((res) => res.json())
-          .then((data) => {
-            document.getElementById("protext").value = data.message;
+          // change conetnts of the button
+          document.getElementById("generate-btn").textContent = "Generating...";
+
+          // clear previous input
+          document.getElementById("protext").value = "";
+
+          // change focus
+          document.getElementById("protext").focus();
+
+          let input = document.getElementById("protext");
+
+          let customNodeCreator = function (character) {
+            input.value = input.value + character;
+            return null;
+          };
+
+          let onRemoveNode = function ({ character }) {
+            if (input.value) {
+              input.value = input.value.slice(0, -1);
+            }
+          };
+
+          let typewriter = new Typewriter(null, {
+            loop: false,
+            delay: 5,
+            onCreateTextNode: customNodeCreator,
+            onRemoveNode: onRemoveNode,
+          });
+          await fetch("/chat", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              topic: topic,
+              type: type,
+              keywords: keywords,
+              tone: tone,
+            }),
           })
-          .catch((err) => console.log(err));
+            .then((res) => res.json())
+            .then((data) => {
+              typewriter.typeString(data.message).pauseFor(100).start();
+
+              setTimeout(() => {
+                // enable button
+                document.getElementById("generate-btn").disabled = false;
+                document.getElementById("generate-btn").classList =
+                  "mb-3 border-2 border-sky-900 p-3 bg-sky-400 text-white mx-5";
+
+                // change conetnts of the button
+                document.getElementById("generate-btn").textContent =
+                  "Generate";
+              }, 5000);
+            })
+            .catch((err) => console.log(err));
+        } else {
+          alert("Please enter Topic / Details");
+        }
       }
     </script>
   </body>
